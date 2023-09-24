@@ -1,7 +1,12 @@
 from riotwatcher import LolWatcher, ApiError
 from collections import defaultdict
 
-REGION = 'NA1'
+LAN = 'LA1'
+
+NA = 'NA1'
+
+# REGION constant can be set to any of the above regions
+REGION = LAN
 
 
 # Gets API key from a file in .gitignore, hiding the key.
@@ -28,10 +33,12 @@ def puuid(summoner):
 def matchlist(summoner_puuid):
     return api.match.matchlist_by_puuid(region=REGION, puuid=summoner_puuid)
 
+# Takes in a match and returns the names of the players in the game
 def names_of_participants(match):
     for player in match['metadata']['participants']:
         print(api.summoner.by_puuid(region=REGION, encrypted_puuid=player)['name'])
 
+# Takes in either a puuid or a name and returns a dict of their role frequency in their last 20 games
 def most_played_roles(puuid=None, name=None):
     if name:
         summoner = api.summoner.by_name(region=REGION, summoner_name=name)
@@ -44,20 +51,19 @@ def most_played_roles(puuid=None, name=None):
     role_frequency = defaultdict(int)
 
     for match in summoner_matchlist:
-        for player in match['info']['participants']:
+        match_details = api.match.by_id(region=REGION, match_id=match)
+        match_info = match_details['info']
+        for player in match_info['participants']:
             if summoner['puuid'] == player['puuid']:
-                role_frequency[player['teamPosition']] += 1
+                role_frequency[player['individualPosition']] += 1
 
     print(role_frequency)
-
 
 challenger_players = challenger_players()
 
 summoner1_matchlist = matchlist(puuid(challenger_players[0]))
 
-print(summoner1_matchlist)
-
-most_played_roles(name='redzstarz')
+most_played_roles(puuid='tWaCuoPkUPuqJIPvDeGkSVp1MFsVaJ1ukNJjVSZVif3cBGo9KZPsvbWRga9Mmo6cZYjxUgXWbBIutw')
 
 #first_match = api.match.by_id(region=REGION, match_id=matchlist[0])
 
