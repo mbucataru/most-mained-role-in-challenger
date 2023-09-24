@@ -1,6 +1,12 @@
 from riotwatcher import LolWatcher, ApiError
+from collections import defaultdict
 
 REGION = 'NA1'
+
+
+# FOR SEP 24TH MATTHEW - CURRENT ISSUE WITH RETRIIVING ROLE LIST IS THAT
+# PUUID IS SOMETIMES 'puuid' AND SOMETIMES 'summonerId'. That is the current
+# problem with the written code
 
 
 # Gets API key from a file in .gitignore, hiding the key.
@@ -23,27 +29,47 @@ def puuid(summoner):
     return api.summoner.by_id(region=REGION, encrypted_summoner_id=summoner['summonerId'])['puuid']
 
 
-# Takes in a summoner and returns its matchlist
-def matchlist(summoner):
-    return api.match.matchlist_by_puuid(region=REGION, puuid=puuid(summoner))
+# Takes in a PUUID and returns its matchlist (an arrays of match IDs)
+def matchlist(summoner_puuid):
+    return api.match.matchlist_by_puuid(region=REGION, puuid=summoner_puuid)
 
 def names_of_participants(match):
     for player in match['metadata']['participants']:
         print(api.summoner.by_puuid(region=REGION, encrypted_puuid=player)['name'])
 
+def most_played_roles(puuid=None, name=None):
+    if name:
+        summoner = api.summoner.by_name(region=REGION, summoner_name=name)
+    elif puuid:
+        summoner = api.summoner.by_puuid(region=REGION, encrypted_puuid=puuid)
+    else:
+        raise ValueError("You must provide either a PUUID or a name.")
+    print(summoner)
+    summoner_matchlist = matchlist(summoner['puuid'])
+    role_frequency = defaultdict(int)
+
+    for match in summoner_matchlist:
+        for player in match['info']['participants']:
+            if summoner['puuid'] == player['puuid']:
+                role_frequency[player['teamPosition']] += 1
+
+    print(role_frequency)
 
 
 challenger_players = challenger_players()
 
-matchlist = matchlist(challenger_players[0])
+summoner1_matchlist = matchlist(puuid(challenger_players[0]))
+
+print(summoner1_matchlist)
+
+most_played_roles(name='redzstarz')
+
+#first_match = api.match.by_id(region=REGION, match_id=matchlist[0])
 
 
-first_match = api.match.by_id(region=REGION, match_id=matchlist[0])
+#print(first_match)
 
-
-print(first_match)
-
-print(api.match.timeline_by_match(REGION, matchlist[0]))
+#print(api.match.timeline_by_match(REGION, matchlist[0]))
 
 
 
