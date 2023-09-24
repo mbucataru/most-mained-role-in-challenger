@@ -4,11 +4,6 @@ from collections import defaultdict
 REGION = 'NA1'
 
 
-# FOR SEP 24TH MATTHEW - CURRENT ISSUE WITH RETRIIVING ROLE LIST IS THAT
-# PUUID IS SOMETIMES 'puuid' AND SOMETIMES 'summonerId'. That is the current
-# problem with the written code
-
-
 # Gets API key from a file in .gitignore, hiding the key.
 def api_key():
     with open('api_key.txt', 'r') as key:
@@ -29,7 +24,7 @@ def puuid(summoner):
     return api.summoner.by_id(region=REGION, encrypted_summoner_id=summoner['summonerId'])['puuid']
 
 
-# Takes in a PUUID and returns its matchlist (an arrays of match IDs)
+# Takes in a PUUID and returns its matchlist (an array of match IDs)
 def matchlist(summoner_puuid):
     return api.match.matchlist_by_puuid(region=REGION, puuid=summoner_puuid)
 
