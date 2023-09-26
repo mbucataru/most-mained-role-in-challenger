@@ -31,7 +31,6 @@ def get_matchlist_from_puuid(summoner_puuid):
     return api.match.matchlist_by_puuid(region=REGION, puuid=summoner_puuid)
 
 
-# Takes in either a puuid or a name and returns a dict of their role frequency in their last 20 games
 def iterate_most_played_role_from_puuid(summoner_puuid, previous_role_frequency):
     summoner = api.summoner.by_puuid(region=REGION, encrypted_puuid=summoner_puuid)
     summoner_matchlist = api.match.matchlist_by_puuid(region=REGION, puuid=summoner_puuid)
@@ -58,7 +57,7 @@ def iterate_most_played_role_from_puuid(summoner_puuid, previous_role_frequency)
         print('Summoner ' + summoner['name'] + "'s has not played ranked in 6 games")
 
 
-def most_mained_role_in_challenger():
+def get_most_mained_role_in_challenger():
     summoners = get_challenger_players_ids()
     main_role_frequency = defaultdict(int)
 
@@ -70,4 +69,4 @@ def most_mained_role_in_challenger():
     return max(main_role_frequency, key=main_role_frequency.get)
 
 
-print('The most mained role in challenger is ' + most_mained_role_in_challenger())
+print('The most mained role in challenger is ' + get_most_mained_role_in_challenger())
